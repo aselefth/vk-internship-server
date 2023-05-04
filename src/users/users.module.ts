@@ -6,6 +6,7 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, PrismaService, JwtStrategy]
+  providers: [UsersService, PrismaService, JwtStrategy],
+  exports: [UsersService]
 })
 export class UsersModule {}

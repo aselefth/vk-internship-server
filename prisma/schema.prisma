@@ -19,7 +19,7 @@ model User {
   posts            Post[]
   recievedRequests User[]   @relation("requests")
   sentRequests     User[]   @relation("requests")
-  friendId         String
+  friendId         String?
   friend           User?    @relation("friends", fields: [friendId], references: [id])
   friends          User[]   @relation("friends")
 }

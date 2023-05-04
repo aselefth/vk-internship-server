@@ -28,22 +28,4 @@ export class UsersController {
   getMyUser(@Param('id') id: string, @Req() req: any) {
     return this.usersService.getMe(id, req);
   }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id/requests/myrequests')
-  getMyRequests(@Param('id') id: string, @Req() req: any) {
-    return this.usersService.getMyRequests(id, req);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id/requests/recievedrequests')
-  getRecievedRequests(@Param('id') id: string, @Req() req: any) {
-    return this.getRecievedRequests(id, req);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post(':id/requests/sendrequest')
-  sendRequest(@Body() body: {initiatorId: string}, @Param('id') recieverId: string, @Req() req: any) {
-    return this.usersService.sendRequest(body.initiatorId, recieverId, req);
-  }
 }
