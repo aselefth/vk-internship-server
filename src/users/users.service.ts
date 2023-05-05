@@ -15,12 +15,13 @@ export class UsersService {
 
   async getAll(): Promise<GetUserDto[]> {
     return await this.prisma.user.findMany({
-      select: { firstName: true, lastName: true, id: true, email: true },
+      select: { firstName: true, lastName: true, id: true, email: true, sentRequests: true, recievedRequests: true }
     });
   }
 
   async getMe(id: string, req: Request): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    const user = await this.prisma.user.findUnique({ where: { id }, include: {sentRequests: true, recievedRequests: true} });
     if (!user) throw new NotFoundException();
 
     const requestingUser = req.user as { email: string; id: string };

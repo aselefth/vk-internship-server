@@ -4,90 +4,90 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { User } from '@prisma/client';
-import { UsersService } from 'src/users/users.service';
+import { FriendRequest, User } from '@prisma/client';
 import { Request } from 'express';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class RequestsService {
   public constructor(
     private prisma: PrismaService,
-    private usersService: UsersService,
+    private usersService: UsersService
   ) {}
 
-  async getSentRequests(
-    id: string,
-    req: Request,
-  ): Promise<{ sentRequests: User[] }> {
-    const myUser = await this.usersService.getMe(id, req);
-    if (!myUser) throw new ForbiddenException();
+  async getSentRequests(id: string, req: Request): Promise<{sentRequests: FriendRequest[]}> {
+    const currentUser = await this.usersService.getMe(id, req);
 
-    return await this.prisma.user.findUnique({
-      where: { email: myUser.email },
-      select: { sentRequests: true },
-    });
+    return await this.prisma.user.findUnique({where: {id}, select: {sentRequests: true}})
   }
 
-  async getRecievedRequests(
-    id: string,
-    req: Request,
-  ): Promise<{ recievedRequests: User[] }> {
-    return await this.prisma.user.findUnique({
-      where: { id },
-      select: { recievedRequests: true },
-    });
+  async getRecievedRequests(id: string, req: Request): Promise<{recievedRequests: FriendRequest[]}> {
+    const currentUser = await this.usersService.getMe(id, req);
+
+    const {recievedRequests} = await this.prisma.user.findUnique({where: {id: currentUser.id}, select: {recievedRequests: true}})
+
+    return {
+      recievedRequests
+    }
   }
 
-  async sendRequest(
-    initiatorId: string,
-    recieverId: string,
-    req: Request,
-  ): Promise<{ result: 'success' }> {
-    const reciever = await this.prisma.user.findFirst({
-      where: { id: recieverId },
-      select: { firstName: true, lastName: true, email: true, id: true },
-    });
+  async sendRequest(initiatorId: string, recieverId: string, req: Request) {
 
-	console.log(recieverId);
-
-    if (!reciever) throw new BadRequestException();
-
-    const initiator = await this.usersService.getMe(initiatorId, req);
+    const currentUser = await this.usersService.getMe(initiatorId, req);
+    if (!currentUser) throw new BadRequestException();
 
     await this.prisma.user.update({
+      where: {
+        id: initiatorId,
+      },
       data: {
         sentRequests: {
           create: {
-            firstName: reciever.firstName,
-            lastName: reciever.lastName,
-            email: reciever.email,
-            password: '',
-            id: reciever.id,
+            recieverId,
           },
         },
       },
-	  where: {
-        id: initiatorId,
-      }
     });
 
-	await this.prisma.user.update({
+    return {
+      result: 'success',
+    };
+  }
+
+  async deleteMyRequest(initiatorId: string, requestId: string, req: Request): Promise<User> {
+
+    const currentUser = await this.usersService.getMe(initiatorId, req);
+
+    const updatedUser = await this.prisma.user.update({data: {
+      sentRequests: {
+        delete: {
+          id: requestId
+        }}
+      },
+      where: {
+        id: initiatorId
+      }
+    })
+
+    return updatedUser
+  }
+
+  async declineRequest (initiatorId: string, requestId: string, req: Request): Promise<User> {
+    const currentUser = await this.usersService.getMe(initiatorId, req);
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: currentUser.id
+      },
       data: {
         recievedRequests: {
-          create: {
-            firstName: initiator.firstName,
-            lastName: initiator.lastName,
-            email: initiator.email,
-            password: '',
-            id: initiator.id,
-          },
-        },
-      },
-	  where: {
-        id: recieverId,
+          delete: {
+            id: requestId
+          }
+        }
       }
     });
 
-    return { result: 'success' };
+    return updatedUser;
   }
 }

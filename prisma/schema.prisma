@@ -8,20 +8,25 @@ datasource db {
 }
 
 model User {
-  id               String   @id @default(uuid())
+  id               String          @id @default(uuid())
   firstName        String
   lastName         String
-  email            String   @unique
+  email            String          @unique
   password         String
   porfileImage     String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt()
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt()
   posts            Post[]
-  recievedRequests User[]   @relation("requests")
-  sentRequests     User[]   @relation("requests")
-  friendId         String?
-  friend           User?    @relation("friends", fields: [friendId], references: [id])
-  friends          User[]   @relation("friends")
+  sentRequests     FriendRequest[] @relation("initiators")
+  recievedRequests FriendRequest[] @relation("recievers")
+}
+
+model FriendRequest {
+  id          String @id @unique @default(uuid())
+  recieverId  String
+  reciever    User   @relation("recievers", fields: [recieverId], references: [id])
+  initiatorId String
+  initiator   User   @relation("initiators", fields: [initiatorId], references: [id])
 }
 
 model Post {
