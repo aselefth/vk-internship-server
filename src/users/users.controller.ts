@@ -6,6 +6,7 @@ import {
   UseGuards,
   Post,
   Body,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { PrismaService } from 'src/prisma.service';
@@ -27,5 +28,10 @@ export class UsersController {
   @Get(':id')
   getMyUser(@Param('id') id: string, @Req() req: any) {
     return this.usersService.getMe(id, req);
+  }
+
+  @Delete()
+  deleteAll() {
+    return this.usersService.deleteUsers()
   }
 }
