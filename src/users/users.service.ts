@@ -15,18 +15,28 @@ export class UsersService {
 
   async getAll(): Promise<GetUserDto[]> {
     return await this.prisma.user.findMany({
-      select: { firstName: true, lastName: true, id: true, email: true, sentRequests: true, recievedRequests: true, friends: true }
+      select: {
+        firstName: true,
+        lastName: true,
+        id: true,
+        email: true,
+        sentRequests: true,
+        recievedRequests: true,
+        friends: true,
+        posts: true,
+      },
     });
   }
 
   async getMe(id: string, req: Request): Promise<User> {
-
-    const user = await this.prisma.user.findFirst({ where: { id: id }, include: {sentRequests: true, recievedRequests: true} });
+    const user = await this.prisma.user.findFirst({
+      where: { id: id },
+      include: { sentRequests: true, recievedRequests: true },
+    });
     if (!user) throw new NotFoundException();
 
     const requestingUser = req.user as { email: string; id: string };
-    console.log(requestingUser.id, user.id);
-    if (user.id !== requestingUser.id) throw new ForbiddenException();
+    if (user.id !== requestingUser?.id) throw new ForbiddenException();
     return user;
   }
 

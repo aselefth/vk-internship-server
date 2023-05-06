@@ -17,6 +17,7 @@ model User {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt()
   posts            Post[]
+  likes            Like[]
   sentRequests     User[]   @relation("requests")
   recievedRequests User[]   @relation("requests")
   friends          User[]   @relation("friends")
@@ -26,14 +27,16 @@ model User {
 model Post {
   id     String @id @unique @default(uuid())
   userId String
-  user   User?  @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
   title  String
   post   String
   likes  Like[]
 }
 
 model Like {
-  id     String @id @unique @default(uuid())
+  id     String  @id @unique @default(uuid())
   postId String
-  post   Post?  @relation(fields: [postId], references: [id])
+  post   Post?   @relation(fields: [postId], references: [id])
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
