@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: RegisterDto): Promise<{ message: string }> {
-    const { email, password, firstName, lastName } = signUpDto;
+    const { email, password, firstName, lastName, age, city, university } = signUpDto;
 
     const storedUser = await this.prisma.user.findUnique({
       where: { email },
@@ -25,7 +25,7 @@ export class AuthService {
     }
 
     const user = await this.prisma.user.create({
-      data: { email, password: await hash(password), firstName, lastName }
+      data: { email, password: await hash(password), firstName, lastName, age, city, university }
     });
 
     return { message: 'user was created successfully' };
