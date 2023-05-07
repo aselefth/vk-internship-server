@@ -8,8 +8,8 @@ export class FriendsController {
 
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  deleteFriend(@Param('id') initiatorId: string, @Body() body: {recieverId: string}, @Req() req: any) {
-    return this.friendsService.deleteFriend(initiatorId, body.recieverId, req);
+  @Delete()
+  deleteFriend(@Body() body: {recieverId: string}, @Req() req: any) {
+    return this.friendsService.deleteFriend(body.recieverId, req);
   }
 }

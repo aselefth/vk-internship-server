@@ -11,17 +11,32 @@ export class PostsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getAll(): Promise<Pick<Post, 'title' | 'post' | 'userId'>[]> {
+  async getAll(): Promise<Pick<Post, 'id'>[]> {
     return await this.prisma.post.findMany({
-      select: { title: true, post: true, userId: true, likes: true, id: true },
+      select: {id: true },
     });
+  }
+
+  async getPostById(postId: string): Promise<Post> {
+    return await this.prisma.post.findFirst({
+      where: {
+        id: postId
+      },
+      select: {
+        id: true,
+        userId: true,
+        title: true,
+        post: true,
+        likes: true
+      }
+    })
   }
 
   async addPost(
     postBody: { userId: string; post: string; title: string },
     req: Request,
   ): Promise<Post> {
-    const currentUser = await this.usersService.getMe(postBody.userId, req);
+    const currentUser = await this.usersService.getMe(req);
 
     const { posts } = await this.prisma.user.update({
       where: {
@@ -48,7 +63,7 @@ export class PostsService {
     req: Request,
   ) {
     const { postId, userId } = likePostBody;
-    const currentUser = await this.usersService.getMe(userId, req);
+    const currentUser = await this.usersService.getMe(req);
 
     const pressedLike = await this.prisma.like.findFirst({
       where: {

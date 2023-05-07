@@ -20,27 +20,27 @@ export class RequestsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':id')
-  sendRequest(@Body() body: {recieverId: string}, @Param('id') initiatorId: string, @Req() req: any) {
-    return this.requestsService.sendRequest(initiatorId, body.recieverId, req);
+  @Post()
+  sendRequest(@Body() body: {recieverId: string}, @Req() req: any) {
+    return this.requestsService.sendRequest(body.recieverId, req);
   }
   
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  deleteMyRequest(@Param('id') initiatorId: string, @Body() body: {recieverId: string}, @Req() req: any ) {
-    return this.requestsService.deleteMyRequest(initiatorId, body.recieverId, req);
+  @Delete()
+  deleteMyRequest(@Body() body: {recieverId: string}, @Req() req: any ) {
+    return this.requestsService.deleteMyRequest(body.recieverId, req);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':id/decline')
-  declineRequest(@Param('id') initiatorId: string, @Body() body: {recieverId: string}, @Req() req: any ) {
-    return this.requestsService.declineRequest(initiatorId, body.recieverId, req);
+  @Post('decline')
+  declineRequest(@Body() body: {recieverId: string}, @Req() req: any ) {
+    return this.requestsService.declineRequest(body.recieverId, req);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':id/accept')
-  acceptRequest(@Param('id') initiatorId: string, @Body() body: {recieverId: string}, @Req() req: any ) {
-    return this.requestsService.acceptRequest(initiatorId, body.recieverId, req);
+  @Post('accept')
+  acceptRequest(@Body() body: {recieverId: string}, @Req() req: any ) {
+    return this.requestsService.acceptRequest(body.recieverId, req);
   }
 }

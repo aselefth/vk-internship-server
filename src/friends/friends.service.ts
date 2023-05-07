@@ -12,8 +12,8 @@ export class FriendsService {
   ) {}
 
   async deleteFriend(
-    initiatorId: string, recieverId: string, req: Request): Promise<{ user: User }> {
-    const currentUser = await this.usersService.getMe(initiatorId, req);
+    recieverId: string, req: Request): Promise<{ user: User }> {
+    const currentUser = await this.usersService.getMe(req);
 
     const updatedUser = await this.prisma.user.update({
       where: {

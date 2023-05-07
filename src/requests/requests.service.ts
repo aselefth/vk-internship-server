@@ -23,14 +23,14 @@ export class RequestsService {
 
   }
 
-  async sendRequest(initiatorId: string, recieverId: string, req: Request) {
+  async sendRequest(recieverId: string, req: Request) {
 
-    const currentUser = await this.usersService.getMe(initiatorId, req);
+    const currentUser = await this.usersService.getMe(req);
     console.log(currentUser)
 
     await this.prisma.user.update({
       where: {
-        id: initiatorId
+        id: currentUser.id
       },
       data: {
         sentRequests: {
@@ -46,9 +46,9 @@ export class RequestsService {
     };
   }
 
-  async deleteMyRequest(initiatorId: string, recieverId: string, req: Request) {
+  async deleteMyRequest(recieverId: string, req: Request) {
 
-    const currentUser = await this.usersService.getMe(initiatorId, req);
+    const currentUser = await this.usersService.getMe(req);
     if (!currentUser) throw new BadRequestException();
     
     await this.prisma.user.update({
@@ -69,14 +69,14 @@ export class RequestsService {
     }
   }
 
-  async declineRequest (initiatorId: string, recieverId: string, req: Request) {
+  async declineRequest (recieverId: string, req: Request) {
    
-    const currentUser = await this.usersService.getMe(initiatorId, req);
+    const currentUser = await this.usersService.getMe(req);
     if (!currentUser) throw new BadRequestException();
 
     await this.prisma.user.update({
       where: {
-        id: initiatorId
+        id: currentUser.id
       },
       data: {
         recievedRequests: {
@@ -92,12 +92,12 @@ export class RequestsService {
     }
   }
 
-  async acceptRequest (initiatorId: string, recieverId: string, req: Request) {
-    const currentUser = await this.usersService.getMe(initiatorId, req);
+  async acceptRequest (recieverId: string, req: Request) {
+    const currentUser = await this.usersService.getMe(req);
 
     await this.prisma.user.update({
       where: {
-        id: initiatorId
+        id: currentUser.id
       },
       data: {
         recievedRequests: {
