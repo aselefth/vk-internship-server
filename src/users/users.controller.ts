@@ -30,6 +30,11 @@ export class UsersController {
     return this.usersService.getMe(req);
   }
 
+  @Get(':id')
+  getUserById(@Param('id') userId: string) {
+    return this.usersService.getUserById(userId);
+  }
+
   @Delete()
   deleteAll() {
     return this.usersService.deleteUsers()

@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -14,7 +18,8 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: RegisterDto): Promise<{ message: string }> {
-    const { email, password, firstName, lastName, age, city, university } = signUpDto;
+    const { email, password, firstName, lastName, age, city, university } =
+      signUpDto;
 
     const storedUser = await this.prisma.user.findUnique({
       where: { email },
@@ -25,13 +30,24 @@ export class AuthService {
     }
 
     const user = await this.prisma.user.create({
-      data: { email, password: await hash(password), firstName, lastName, age, city, university }
+      data: {
+        email,
+        password: await hash(password),
+        firstName,
+        lastName,
+        age,
+        city,
+        university,
+      },
     });
 
     return { message: 'user was created successfully' };
   }
 
-  async signIn(signInDto: LoginDto, res: Response,): Promise<Response<any, Record<string, any>>> {
+  async signIn(
+    signInDto: LoginDto,
+    res: Response,
+  ): Promise<Response<any, Record<string, any>>> {
     const { email, password } = signInDto;
 
     const storedUser = await this.prisma.user.findFirst({
@@ -57,7 +73,16 @@ export class AuthService {
 
     res.cookie('jwt_token', jwt_token);
 
-    return res.send({ message: 'you logged in successfully' });
+    return res.send({
+      id: storedUser.id,
+      firstName: storedUser.firstName,
+      lastName: storedUser.lastName,
+      age: storedUser.age,
+      city: storedUser.city,
+      university: storedUser.university,
+      email: storedUser.email,
+      password: storedUser.password
+    });
   }
 
   async signOut(res: Response): Promise<Record<string, any>> {

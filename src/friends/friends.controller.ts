@@ -1,4 +1,4 @@
-import { Controller, Delete, Req, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Req, Param, Body, UseGuards, Get } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
@@ -6,6 +6,11 @@ import { JwtAuthGuard } from 'src/auth/jwt.guard';
 export class FriendsController {
   constructor(private readonly friendsService: FriendsService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  getFriends(@Req() req: any) {
+    return this.friendsService.getFriends(req);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Delete()

@@ -8,15 +8,15 @@ export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id/myrequests')
-  getMyRequests(@Param('id') id: string, @Req() req: any) {
-    return this.requestsService.getSentRequests(id, req);
+  @Get('myrequests')
+  getMyRequests(@Req() req: any) {
+    return this.requestsService.getSentRequests(req);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id/recievedrequests')
-  getRecievedRequests(@Param('id') id: string, @Req() req: any) {
-    return this.requestsService.getRecievedRequests(id, req);
+  @Get('recievedrequests')
+  getRecievedRequests(@Req() req: any) {
+    return this.requestsService.getRecievedRequests(req);
   }
 
   @UseGuards(JwtAuthGuard)

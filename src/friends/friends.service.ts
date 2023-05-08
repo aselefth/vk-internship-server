@@ -11,6 +11,21 @@ export class FriendsService {
     private readonly usersService: UsersService,
   ) {}
 
+  async getFriends (req: Request): Promise<User[]> {
+    const user = await this.usersService.getMe(req);
+
+    const {friends} = await this.prisma.user.findFirst({
+      where: {
+        id: user.id
+      },
+      select: {
+        friends: true
+      }
+    })
+
+    return friends
+  }
+
   async deleteFriend(
     recieverId: string, req: Request): Promise<{ user: User }> {
     const currentUser = await this.usersService.getMe(req);

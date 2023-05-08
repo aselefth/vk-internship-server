@@ -15,12 +15,30 @@ export class RequestsService {
     private usersService: UsersService
   ) {}
 
-  async getSentRequests(id: string, req: Request) {
+  async getSentRequests(req: Request): Promise<{sentRequests: User[]}> {
+    const currentUser = await this.usersService.getMe(req);
 
+    return await this.prisma.user.findFirst({
+      where: {
+        id: currentUser.id
+      },
+      select: {
+        sentRequests: true
+      }
+    })
   }
 
-  async getRecievedRequests(id: string, req: Request) {
+  async getRecievedRequests(req: Request): Promise<{recievedRequests: User[]}> {
+    const currentUser = await this.usersService.getMe(req);
 
+    return await this.prisma.user.findFirst({
+      where: {
+        id: currentUser.id
+      },
+      select: {
+        recievedRequests: true
+      }
+    })
   }
 
   async sendRequest(recieverId: string, req: Request) {

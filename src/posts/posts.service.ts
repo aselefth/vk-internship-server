@@ -12,9 +12,19 @@ export class PostsService {
   ) {}
 
   async getAll(): Promise<Pick<Post, 'id'>[]> {
-    return await this.prisma.post.findMany({
+    const posts = await this.prisma.post.findMany({
       select: {id: true },
     });
+
+    return posts.reverse();
+  }
+
+  async getUserPostsById(userId: string): Promise<Post[]> {
+    return await this.prisma.post.findMany({
+      where: {
+        userId
+      }
+    })
   }
 
   async getPostById(postId: string): Promise<Post> {
@@ -25,15 +35,15 @@ export class PostsService {
       select: {
         id: true,
         userId: true,
-        title: true,
         post: true,
-        likes: true
+        likedBy: true,
+        createdAt: true
       }
     })
   }
 
   async addPost(
-    postBody: { userId: string; post: string; title: string },
+    postBody: { userId: string; post: string; },
     req: Request,
   ): Promise<Post> {
     const currentUser = await this.usersService.getMe(req);
@@ -45,8 +55,7 @@ export class PostsService {
       data: {
         posts: {
           create: {
-            title: postBody.title,
-            post: postBody.post,
+            post: postBody.post
           },
         },
       },
@@ -59,36 +68,57 @@ export class PostsService {
   }
 
   async togglePostLike(
-    likePostBody: { userId: string; postId: string },
+    likePostBody: {postId: string },
     req: Request,
   ) {
-    const { postId, userId } = likePostBody;
+    const { postId } = likePostBody;
     const currentUser = await this.usersService.getMe(req);
 
-    const pressedLike = await this.prisma.like.findFirst({
+    const myLike = await this.prisma.user.findFirst({
       where: {
-        postId,
-        userId,
-      },
+        id: currentUser.id,
+        likedPosts: {
+          some: {
+            id: postId
+          }
+        }
+      }
     });
 
-    if (pressedLike) {
-      await this.prisma.like.delete({
+    if (myLike) {
+      await this.prisma.post.update({
         where: {
-          id: pressedLike.id,
+          id: postId
         },
-      });
-    } else {
-      await this.prisma.like.create({
         data: {
-          userId: likePostBody.userId,
-          postId: likePostBody.postId,
+          likedBy: {
+            disconnect: {
+              id: currentUser.id
+            }
+          }
+        }
+      })
+    } else {
+      await this.prisma.post.update({
+        where: {
+          id: postId
         },
-      });
+        data: {
+          likedBy: {
+            connect: {
+              id: currentUser.id
+            }
+          }
+        }
+      })
     }
 
     return {
       result: 'success',
     };
+  }
+
+  async deletePosts () {
+    await this.prisma.post.deleteMany();
   }
 }

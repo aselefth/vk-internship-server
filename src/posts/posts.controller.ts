@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -8,7 +9,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { Post as PostType } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
 @Controller('posts')
@@ -25,10 +25,15 @@ export class PostsController {
     return this.postsService.getPostById(postId);
   }
 
+  @Get('userposts/:id')
+  getUserPosts (@Param('id') id: string) {
+    return this.postsService.getUserPostsById(id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post()
   createPost(
-    @Body() postBody: { userId: string; post: string; title: string },
+    @Body() postBody: { userId: string; post: string; },
     @Req() req: any,
   ) {
     return this.postsService.addPost(postBody, req);
@@ -37,9 +42,14 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @Post('/like')
   togglePostLike(
-    @Body() likePostBody: { userId: string; postId: string },
+    @Body() likePostBody: {postId: string },
     @Req() req: any,
   ) {
     return this.postsService.togglePostLike(likePostBody, req);
+  }
+
+  @Delete()
+  deleteAllPosts() {
+    return this.postsService.deletePosts();
   }
 }

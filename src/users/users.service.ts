@@ -41,4 +41,21 @@ export class UsersService {
   async deleteUsers() {
     await this.prisma.user.deleteMany();
   }
+
+  async getUserById(userId: string): Promise<Pick<User, 'firstName' | 'lastName' | 'age' | 'city' | 'id' | 'university' | 'email'>> {
+    return await this.prisma.user.findFirst({
+      where: {
+        id: userId
+      },
+      select: {
+        firstName: true,
+        lastName: true,
+        age: true,
+        city: true,
+        university: true,
+        id: true,
+        email: true
+      }
+    })
+  }
 }
