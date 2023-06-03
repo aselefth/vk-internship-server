@@ -47,6 +47,7 @@ export class FilesController {
       postId: query.postId,
       userId: query.userId,
     });
+    console.log('FILE PIPE');
     file.pipe(res);
   }
 }

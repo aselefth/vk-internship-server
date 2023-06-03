@@ -24,21 +24,31 @@ export class FilesService {
     return { ok: false };
   }
 
-  async getFile({ postId, userId }: { postId?: string; userId?: string }): Promise<ReadStream> {
-
-    let filePath = '';
+  async getFile({
+    postId,
+    userId,
+  }: {
+    postId?: string;
+    userId?: string;
+  }): Promise<ReadStream> {
     if (postId) {
-      filePath = (await this.prisma.post.findFirst({
-        where: { id: postId },
-        select: { filePath: true },
-      })).filePath;
-    } else {
-        filePath = (await this.prisma.user.findFirst({
-            where: { id: userId },
-            select: { filePath: true },
-          })).filePath;
-    }
+      const filePath = (
+        await this.prisma.post.findFirst({
+          where: { id: postId },
+          select: { filePath: true },
+        })
+      ).filePath;
 
-    return createReadStream(filePath);
+      return createReadStream(filePath);
+    } else {
+      const filePath = (
+        await this.prisma.user.findFirst({
+          where: { id: userId },
+          select: { filePath: true },
+        })
+      ).filePath;
+
+      return createReadStream(filePath);
+    }
   }
 }
