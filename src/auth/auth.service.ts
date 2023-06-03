@@ -81,7 +81,7 @@ export class AuthService {
       city: storedUser.city,
       university: storedUser.university,
       email: storedUser.email,
-      password: storedUser.password
+      password: storedUser.password,
     });
   }
 

@@ -16,7 +16,6 @@ model User {
   university       String
   email            String   @unique
   password         String
-  porfileImage     String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt()
   posts            Post[]
@@ -25,6 +24,7 @@ model User {
   recievedRequests User[]   @relation("requests")
   friends          User[]   @relation("friends")
   friendsRelation  User[]   @relation("friends")
+  filePath String?
 }
 
 model Post {
@@ -34,4 +34,5 @@ model Post {
   post      String
   likedBy   User[]   @relation("likes")
   createdAt DateTime @default(now())
+  filePath  String?
 }

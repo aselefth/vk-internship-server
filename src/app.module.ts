@@ -7,9 +7,19 @@ import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
 import { RequestsModule } from './requests/requests.module';
 import { FriendsModule } from './friends/friends.module';
+import { FilesModule } from './files/files.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
-  imports: [AuthModule, UsersModule, PostsModule, RequestsModule, FriendsModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    PostsModule,
+    RequestsModule,
+    FriendsModule,
+    FilesModule,
+    MulterModule.register({ dest: './uploads' }),
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

@@ -6,10 +6,15 @@ import {
   Param,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('posts')
 export class PostsController {
@@ -30,10 +35,11 @@ export class PostsController {
     return this.postsService.getUserPostsById(id);
   }
 
+
   @UseGuards(JwtAuthGuard)
   @Post()
   createPost(
-    @Body() postBody: { userId: string; post: string; },
+    @Body() postBody: { post: string;  },
     @Req() req: any,
   ) {
     return this.postsService.addPost(postBody, req);

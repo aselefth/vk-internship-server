@@ -54,7 +54,7 @@ export class UsersService {
         city: true,
         university: true,
         id: true,
-        email: true
+        email: true,
       }
     })
   }

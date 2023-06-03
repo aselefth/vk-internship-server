@@ -37,25 +37,27 @@ export class PostsService {
         userId: true,
         post: true,
         likedBy: true,
-        createdAt: true
+        createdAt: true,
+        filePath: true
       }
     })
   }
 
   async addPost(
-    postBody: { userId: string; post: string; },
+    postBody: { post: string;  },
     req: Request,
   ): Promise<Post> {
     const currentUser = await this.usersService.getMe(req);
 
     const { posts } = await this.prisma.user.update({
       where: {
-        id: postBody.userId,
+        id: currentUser.id,
       },
       data: {
         posts: {
           create: {
-            post: postBody.post
+            post: postBody.post,
+            filePath: ''
           },
         },
       },
@@ -73,6 +75,7 @@ export class PostsService {
   ) {
     const { postId } = likePostBody;
     const currentUser = await this.usersService.getMe(req);
+    console.log(postId);
 
     const myLike = await this.prisma.user.findFirst({
       where: {
