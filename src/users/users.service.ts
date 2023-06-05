@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma.service';
@@ -42,10 +37,12 @@ export class UsersService {
     await this.prisma.user.deleteMany();
   }
 
-  async getUserById(userId: string): Promise<Pick<User, 'firstName' | 'lastName' | 'age' | 'city' | 'id' | 'university' | 'email'>> {
+  async getUserById(
+    userId: string,
+  ): Promise<Omit<User, 'createdAt' | 'updatedAt' | 'password'>> {
     return await this.prisma.user.findFirst({
       where: {
-        id: userId
+        id: userId,
       },
       select: {
         firstName: true,
@@ -55,7 +52,28 @@ export class UsersService {
         university: true,
         id: true,
         email: true,
-      }
-    })
+        filePath: true,
+      },
+    });
+  }
+
+  async updateUser(
+    req: Request,
+    body: Omit<User, 'password' | 'createdAt' | 'updatedAt'>,
+  ): Promise<{ ok: boolean }> {
+    const me = req.user as { email: string; id: string };
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: me.id,
+      },
+      data: { ...body },
+    });
+
+    if (!updatedUser) {
+      return { ok: false };
+    }
+
+    return { ok: true };
   }
 }

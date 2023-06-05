@@ -7,10 +7,27 @@ import { PrismaService } from 'src/prisma.service';
 export class FilesService {
   public constructor(private readonly prisma: PrismaService) {}
 
-  async uploadFile(filePath: string, postId: string): Promise<{ ok: boolean }> {
+  async uploadPostFile(filePath: string, postId: string): Promise<{ ok: boolean }> {
     const res = await this.prisma.post.update({
       where: {
         id: postId,
+      },
+      data: {
+        filePath,
+      },
+    });
+
+    if (res) {
+      return { ok: true };
+    }
+
+    return { ok: false };
+  }
+
+  async uploadUserFile(filePath: string, userId: string): Promise<{ ok: boolean }> {
+    const res = await this.prisma.user.update({
+      where: {
+        id: userId,
       },
       data: {
         filePath,
