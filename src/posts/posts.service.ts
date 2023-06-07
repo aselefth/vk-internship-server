@@ -69,7 +69,6 @@ export class PostsService {
   async togglePostLike(likePostBody: { postId: string }, req: Request) {
     const { postId } = likePostBody;
     const currentUser = await this.usersService.getMe(req);
-    console.log(postId);
 
     const myLike = await this.prisma.user.findFirst({
       where: {
@@ -117,5 +116,22 @@ export class PostsService {
 
   async deletePosts() {
     await this.prisma.post.deleteMany();
+  }
+
+  async getLikedPosts(req: Request) {
+    const me = req.user as { email: string; id: string };
+    const posts = await this.prisma.post.findMany({
+      where: {
+        likedBy: {
+          some: {
+            id: me.id,
+          },
+        },
+      },
+    });
+
+    console.log(posts, "posts");
+
+    return posts;
   }
 }

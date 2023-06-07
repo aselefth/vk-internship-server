@@ -1,19 +1,21 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  Param,
   Post,
   Query,
   Req,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
 @Controller('files')
 export class FilesController {
@@ -64,11 +66,28 @@ export class FilesController {
   }
 
   @Get()
-  async getFile(@Query() query: { postId?: string; userId?: string }, @Res() res: any) {
+  async getFile(
+    @Query() query: { postId?: string; userId?: string },
+    @Res() res: any,
+  ) {
     const file = await this.filesService.getFile({
       postId: query.postId,
       userId: query.userId,
     });
     file.pipe(res);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  deleteFile(
+    @Req() req: any,
+    @Query() query: { postId?: string },
+    @Body() {filePath}: any,
+  ) {
+    return this.filesService.deleteFile({
+      req,
+      postId: query.postId,
+      filePath,
+    });
   }
 }

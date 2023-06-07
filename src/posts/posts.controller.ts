@@ -26,36 +26,35 @@ export class PostsController {
   }
 
   @Get(':id')
-  getPostById(@Param('id')postId: string) {
+  getPostById(@Param('id') postId: string) {
     return this.postsService.getPostById(postId);
   }
 
   @Get('userposts/:id')
-  getUserPosts (@Param('id') id: string) {
+  getUserPosts(@Param('id') id: string) {
     return this.postsService.getUserPostsById(id);
   }
 
-
   @UseGuards(JwtAuthGuard)
   @Post()
-  createPost(
-    @Body() postBody: { post: string;  },
-    @Req() req: any,
-  ) {
+  createPost(@Body() postBody: { post: string }, @Req() req: any) {
     return this.postsService.addPost(postBody, req);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/like')
-  togglePostLike(
-    @Body() likePostBody: {postId: string },
-    @Req() req: any,
-  ) {
+  togglePostLike(@Body() likePostBody: { postId: string }, @Req() req: any) {
     return this.postsService.togglePostLike(likePostBody, req);
   }
 
   @Delete()
   deleteAllPosts() {
     return this.postsService.deletePosts();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/me/liked')
+  getLikedPosts(@Req() req: any) {
+    return this.postsService.getLikedPosts(req);
   }
 }
