@@ -52,9 +52,8 @@ export class PostsController {
     return this.postsService.deletePosts();
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/me/liked')
-  getLikedPosts(@Req() req: any) {
-    return this.postsService.getLikedPosts(req);
+  @Get('/users/liked/:id')
+  getLikedPosts(@Param('id') id: string) {
+    return this.postsService.getLikedPosts(id);
   }
 }

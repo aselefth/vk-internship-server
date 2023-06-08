@@ -118,19 +118,16 @@ export class PostsService {
     await this.prisma.post.deleteMany();
   }
 
-  async getLikedPosts(req: Request) {
-    const me = req.user as { email: string; id: string };
+  async getLikedPosts(id: string) {
     const posts = await this.prisma.post.findMany({
       where: {
         likedBy: {
           some: {
-            id: me.id,
+            id,
           },
         },
       },
     });
-
-    console.log(posts, "posts");
 
     return posts;
   }

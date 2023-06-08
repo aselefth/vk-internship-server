@@ -53,6 +53,9 @@ export class UsersService {
         id: true,
         email: true,
         filePath: true,
+        sentRequests: true,
+        recievedRequests: true,
+        friends: true
       },
     });
   }
