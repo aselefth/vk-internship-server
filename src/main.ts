@@ -8,6 +8,7 @@ import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const port = process.env.PORT || 3001;
 
  app.enableCors({
   origin: process.env.CLIENT_ORIGIN,
@@ -20,6 +21,6 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
 
-  await app.listen(3001);
+  await app.listen(port);
 }
 bootstrap();
