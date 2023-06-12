@@ -1,13 +1,13 @@
 import {
-  Controller,
-  Param,
-  Get,
-  Req,
-  UseGuards,
-  Post,
-  Body,
-  Delete,
-  Put
+   Controller,
+   Param,
+   Get,
+   Req,
+   UseGuards,
+   Post,
+   Body,
+   Delete,
+   Put,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { PrismaService } from 'src/prisma.service';
@@ -16,35 +16,48 @@ import { User } from '@prisma/client';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly prisma: PrismaService,
-  ) {}
+   constructor(
+      private readonly usersService: UsersService,
+      private readonly prisma: PrismaService,
+   ) {}
 
-  @Get()
-  getAll() {
-    return this.usersService.getAll();
-  }
+   @Get()
+   getAll() {
+      return this.usersService.getAll();
+   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('getme')
-  getMyUser(@Req() req: any) {
-    return this.usersService.getMe(req);
-  }
+   @UseGuards(JwtAuthGuard)
+   @Get('getme')
+   getMyUser(@Req() req: any) {
+      return this.usersService.getMe(req);
+   }
 
-  @Get(':id')
-  getUserById(@Param('id') userId: string) {
-    return this.usersService.getUserById(userId);
-  }
+   @Get(':id')
+   getUserById(@Param('id') userId: string) {
+      return this.usersService.getUserById(userId);
+   }
 
-  @Delete()
-  deleteAll() {
-    return this.usersService.deleteUsers()
-  }
+   @Delete()
+   deleteAll() {
+      return this.usersService.deleteUsers();
+   }
 
-  @UseGuards(JwtAuthGuard)
-  @Put()
-  updateUser (@Req() req: any, @Body() body: Omit<User, 'password' | 'createdAt' | 'updatedAt'>) {
-    return this.usersService.updateUser(req, body);
-  }
+   @UseGuards(JwtAuthGuard)
+   @Put()
+   updateUser(
+      @Req() req: any,
+      @Body() body: Omit<User, 'password' | 'createdAt' | 'updatedAt'>,
+   ) {
+      return this.usersService.updateUser(req, body);
+   }
+
+   @Get(':id/subscribers')
+   getSubs(@Param('id') id: string) {
+		return this.usersService.getSubscribers(id);
+	}
+
+	@Get(':id/subscriptions')
+   getSubscriptions(@Param('id') id: string) {
+		return this.usersService.getSubscriptions(id);
+	}
 }

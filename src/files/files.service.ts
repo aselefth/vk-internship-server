@@ -71,6 +71,10 @@ export class FilesService {
         })
       );
 
+      if (!filePath) {
+        return;
+      }
+
       return createReadStream(filePath);
     }
   }

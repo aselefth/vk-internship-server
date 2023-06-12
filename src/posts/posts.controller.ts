@@ -56,4 +56,10 @@ export class PostsController {
   getLikedPosts(@Param('id') id: string) {
     return this.postsService.getLikedPosts(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/subscribed')
+  getSubscribedPosts(@Req() req:any) {
+    return this.postsService.getSubscribedPosts(req);
+  }
 }

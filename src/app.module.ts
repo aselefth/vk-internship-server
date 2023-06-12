@@ -9,6 +9,7 @@ import { RequestsModule } from './requests/requests.module';
 import { FriendsModule } from './friends/friends.module';
 import { FilesModule } from './files/files.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MulterModule } from '@nestjs/platform-express';
     FriendsModule,
     FilesModule,
     MulterModule.register({ dest: './uploads' }),
+    ConfigModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

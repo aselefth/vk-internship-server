@@ -74,7 +74,8 @@ export class FilesController {
       postId: query.postId,
       userId: query.userId,
     });
-    file.pipe(res);
+
+    file && file.pipe(res);
   }
 
   @UseGuards(JwtAuthGuard)

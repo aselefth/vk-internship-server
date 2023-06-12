@@ -6,129 +6,159 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class PostsService {
-  public constructor(
-    private readonly prisma: PrismaService,
-    private readonly usersService: UsersService,
-  ) {}
+   public constructor(
+      private readonly prisma: PrismaService,
+      private readonly usersService: UsersService,
+   ) {}
 
-  async getAll(): Promise<Pick<Post, 'id'>[]> {
-    const posts = await this.prisma.post.findMany({
-      select: { id: true },
-    });
+   async getAll(): Promise<Pick<Post, 'id'>[]> {
+      const posts = await this.prisma.post.findMany({
+         select: { id: true },
+      });
 
-    return posts.reverse();
-  }
+      return posts.reverse();
+   }
 
-  async getUserPostsById(userId: string): Promise<Post[]> {
-    return await this.prisma.post.findMany({
-      where: {
-        userId,
-      },
-    });
-  }
+   async getUserPostsById(userId: string): Promise<Post[]> {
+      return await this.prisma.post.findMany({
+         where: {
+            userId,
+         },
+      });
+   }
 
-  async getPostById(postId: string): Promise<Post> {
-    return await this.prisma.post.findFirst({
-      where: {
-        id: postId,
-      },
-      select: {
-        id: true,
-        userId: true,
-        post: true,
-        likedBy: true,
-        createdAt: true,
-        filePath: true,
-      },
-    });
-  }
-
-  async addPost(postBody: { post: string }, req: Request): Promise<Post> {
-    const currentUser = await this.usersService.getMe(req);
-
-    const { posts } = await this.prisma.user.update({
-      where: {
-        id: currentUser.id,
-      },
-      data: {
-        posts: {
-          create: {
-            post: postBody.post,
-            filePath: '',
-          },
-        },
-      },
-      include: {
-        posts: true,
-      },
-    });
-
-    return posts.find((post) => post.post === postBody.post);
-  }
-
-  async togglePostLike(likePostBody: { postId: string }, req: Request) {
-    const { postId } = likePostBody;
-    const currentUser = await this.usersService.getMe(req);
-
-    const myLike = await this.prisma.user.findFirst({
-      where: {
-        id: currentUser.id,
-        likedPosts: {
-          some: {
+   async getPostById(postId: string): Promise<Post> {
+      return await this.prisma.post.findFirst({
+         where: {
             id: postId,
-          },
-        },
-      },
-    });
-
-    if (myLike) {
-      await this.prisma.post.update({
-        where: {
-          id: postId,
-        },
-        data: {
-          likedBy: {
-            disconnect: {
-              id: currentUser.id,
-            },
-          },
-        },
+         },
+         select: {
+            id: true,
+            userId: true,
+            post: true,
+            likedBy: true,
+            createdAt: true,
+            filePath: true,
+         },
       });
-    } else {
-      await this.prisma.post.update({
-        where: {
-          id: postId,
-        },
-        data: {
-          likedBy: {
-            connect: {
-              id: currentUser.id,
+   }
+
+   async addPost(postBody: { post: string }, req: Request): Promise<Post> {
+      const currentUser = await this.usersService.getMe(req);
+
+      const { posts } = await this.prisma.user.update({
+         where: {
+            id: currentUser.id,
+         },
+         data: {
+            posts: {
+               create: {
+                  post: postBody.post,
+                  filePath: '',
+               },
             },
-          },
-        },
+         },
+         include: {
+            posts: true,
+         },
       });
-    }
 
-    return {
-      result: 'success',
-    };
-  }
+      return posts.find((post) => post.post === postBody.post);
+   }
 
-  async deletePosts() {
-    await this.prisma.post.deleteMany();
-  }
+   async togglePostLike(likePostBody: { postId: string }, req: Request) {
+      const { postId } = likePostBody;
+      const currentUser = await this.usersService.getMe(req);
 
-  async getLikedPosts(id: string) {
-    const posts = await this.prisma.post.findMany({
-      where: {
-        likedBy: {
-          some: {
-            id,
-          },
-        },
-      },
-    });
+      const myLike = await this.prisma.user.findFirst({
+         where: {
+            id: currentUser.id,
+            likedPosts: {
+               some: {
+                  id: postId,
+               },
+            },
+         },
+      });
 
-    return posts;
-  }
+      if (myLike) {
+         await this.prisma.post.update({
+            where: {
+               id: postId,
+            },
+            data: {
+               likedBy: {
+                  disconnect: {
+                     id: currentUser.id,
+                  },
+               },
+            },
+         });
+      } else {
+         await this.prisma.post.update({
+            where: {
+               id: postId,
+            },
+            data: {
+               likedBy: {
+                  connect: {
+                     id: currentUser.id,
+                  },
+               },
+            },
+         });
+      }
+
+      return {
+         result: 'success',
+      };
+   }
+
+   async deletePosts() {
+      await this.prisma.post.deleteMany();
+   }
+
+   async getLikedPosts(id: string) {
+      const posts = await this.prisma.post.findMany({
+         where: {
+            likedBy: {
+               some: {
+                  id,
+               },
+            },
+         },
+      });
+
+      return posts;
+   }
+
+   async getSubscribedPosts(
+      req: Request,
+   ): Promise<{ ok: boolean; posts?: Pick<Post, 'id'>[]; error?: string }> {
+      const usr = req.user as { email: string; id: string };
+
+      const posts = await this.prisma.post.findMany({
+         where: {
+            user: {
+               recievedRequests: {
+                  some: {
+                     id: usr.id,
+                  },
+               },
+            },
+         },
+			select: {
+				id: true
+			}
+      });
+
+      if (!posts) {
+         return {
+            ok: false,
+            error: 'some error happened',
+         };
+      }
+
+      return { ok: true, posts: posts };
+   }
 }
